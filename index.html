@@ -1,0 +1,232 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dhyey Patel — Portfolio</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + ReactDOM UMD builds -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for in-browser JSX transpile (only for demo/static hosting) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- App code (JSX) -->
+  <script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+
+  function Portfolio() {
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const horizontalScrollRef = useRef(null);
+
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      const handleScroll = () => {
+        const scrolled = window.scrollY || window.pageYOffset || 0;
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        setScrollProgress(scrolled / maxScroll);
+      };
+      const handleMouseMove = (e) => setMousePosition({ x: e.clientX, y: e.clientY });
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener('mousemove', handleMouseMove);
+      handleScroll();
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('mousemove', handleMouseMove);
+      };
+    }, []);
+
+    const projects = [
+      { title: 'PDF RAG Summarizer', description: 'AI-powered document analysis tool using RAG architecture for intelligent PDF summarization', tags: ['Python','AI/ML','NLP','RAG'], color: '#6366f1' },
+      { title: 'Portfolio Website', description: 'Modern, responsive portfolio with smooth animations and horizontal parallax effects', tags: ['React','CSS','UI/UX','Animation'], color: '#ec4899' },
+      { title: 'Fiverr Projects', description: 'Custom web solutions, automation scripts, and full-stack applications for clients worldwide', tags: ['Full-Stack','Python','JavaScript','Automation'], color: '#10b981' }
+    ];
+
+    const skills = ['Python','JavaScript','React','HTML/CSS','MS SQL','Linux OS','Bash Scripting','Git','Security Analysis','Full-Stack Development'];
+
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          html, body, #root { height: 100%; }
+          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #000; color: #fff; overflow-x: hidden; }
+
+          .cursor { width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; mix-blend-mode: difference; transition: transform 0.1s ease; }
+          .cursor-trail { width: 8px; height: 8px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; mix-blend-mode: difference; transition: all 0.15s ease; }
+
+          .header { position: fixed; top: 0; left: 0; right: 0; padding: 30px 60px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+          .logo { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+          .nav { display: flex; gap: 40px; }
+          .nav-link { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: #fff; text-decoration: none; transition: opacity 0.3s; }
+          .nav-link:hover { opacity: 0.5; }
+
+          .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+          .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, rgba(0,0,0,1) 70%); }
+          .grid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 100px 100px; animation: gridMove 20s linear infinite; }
+          @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(100px, 100px); } }
+
+          .hero-content { position: relative; z-index: 2; text-align: center; }
+          .hero-tag { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 30px; opacity: 0.6; font-weight: 500; }
+          .hero-title { font-size: 72px; font-weight: 800; margin-bottom: 20px; letter-spacing: -3px; background: linear-gradient(135deg, #fff 0%, #999 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; }
+          .hero-subtitle { font-size: 20px; font-weight: 300; margin-bottom: 10px; letter-spacing: 1px; }
+          .hero-description { font-size: 16px; font-weight: 400; color: #999; letter-spacing: 0.5px; }
+
+          .scroll-indicator { position: absolute; bottom: 40px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; animation: bounce 2s infinite; }
+          @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+          .about { padding: 80px 30px; background: #000; }
+          .section-title { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 40px; opacity: 0.5; font-weight: 600; }
+          .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1100px; margin: 0 auto; }
+          .about-text { font-size: 18px; line-height: 1.7; font-weight: 300; color: #ccc; }
+          .about-text p { margin-bottom: 20px; }
+
+          .skills-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+          .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .skill-tag { padding: 10px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; font-size: 13px; font-weight: 500; text-align: center; transition: all 0.3s ease; letter-spacing: 1px; }
+          .skill-tag:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
+
+          .projects-section { padding: 60px 0; background: #000; overflow: hidden; }
+          .projects-title { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 40px; opacity: 0.5; font-weight: 600; padding: 0 30px; }
+          .horizontal-scroll { display: flex; gap: 30px; padding: 0 30px 30px 30px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
+          .horizontal-scroll::-webkit-scrollbar { height: 6px; }
+          .horizontal-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+          .horizontal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+          .project-card { min-width: 300px; height: 320px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; scroll-snap-align: start; position: relative; overflow: hidden; transition: all 0.4s ease; }
+          .project-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%); opacity: 0; transition: opacity 0.4s ease; }
+          .project-card:hover::before { opacity: 1; }
+          .project-card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.3); }
+          .project-number { font-size: 60px; font-weight: 800; position: absolute; top: 20px; right: 20px; opacity: 0.05; line-height: 1; }
+          .project-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+          .project-header h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; letter-spacing: -1px; }
+          .project-description { font-size: 14px; line-height: 1.6; color: #999; margin-bottom: 10px; }
+          .project-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+          .project-tag { padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+          .project-color-accent { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; transition: height 0.4s ease; }
+          .project-card:hover .project-color-accent { height: 8px; }
+
+          .contact { padding: 80px 30px; text-align: center; background: #000; }
+          .contact h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; opacity: 0.5; font-weight: 600; }
+          .cta-button { display: inline-block; padding: 12px 28px; background: transparent; border: 2px solid #fff; color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: all 0.3s ease; margin-bottom: 40px; }
+          .cta-button:hover { background: #fff; color: #000; }
+
+          .social-links { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+          .social-link { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 1px; transition: all 0.3s ease; }
+          .social-link:hover { opacity: 0.6; transform: translateX(5px); }
+          .arrow { transition: transform 0.3s ease; }
+          .social-link:hover .arrow { transform: translateX(5px); }
+
+          footer { padding: 30px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid rgba(255,255,255,0.1); }
+
+          @media (max-width: 768px) {
+            .hero-title { font-size: 40px; }
+            .about-grid { grid-template-columns: 1fr; gap: 30px; }
+            .project-card { min-width: 85vw; }
+            .header { padding: 20px 16px; }
+            .nav { display: none; }
+            .skills-grid { grid-template-columns: 1fr; }
+          }
+        `}</style>
+
+        <div
+          className="cursor"
+          style={{ left: mousePosition.x + 'px', top: mousePosition.y + 'px', transform: 'translate(-50%, -50%)' }}
+        />
+        <div
+          className="cursor-trail"
+          style={{ left: mousePosition.x + 'px', top: mousePosition.y + 'px', transform: 'translate(-50%, -50%)' }}
+        />
+
+        <header className="header">
+          <div className="logo">Dhyey Patel // Portfolio</div>
+          <nav className="nav">
+            <a href="#about" className="nav-link">About</a>
+            <a href="#work" className="nav-link">Work</a>
+            <a href="#contact" className="nav-link">Contact</a>
+          </nav>
+        </header>
+
+        <section className="hero">
+          <div className="hero-bg" />
+          <div className="grid-overlay" />
+          <div className="hero-content">
+            <div className="hero-tag">Developer Since 2020</div>
+            <h1 className="hero-title">Dhyey Patel</h1>
+            <h2 className="hero-subtitle">Front-End Developer</h2>
+            <p className="hero-description">Security Analyst • Full-Stack Developer</p>
+          </div>
+          <div className="scroll-indicator">Scroll Down ↓</div>
+        </section>
+
+        <section id="about" className="about">
+          <h2 className="section-title">// About Me</h2>
+          <div className="about-grid">
+            <div className="about-text">
+              <p>As a passionate developer and security analyst student, I specialize in creating efficient, user-friendly web applications while exploring the depths of cybersecurity.</p>
+              <p>Currently working as a freelancer on Fiverr, I bring creative solutions to complex problems, from AI-powered document analysis to dynamic web experiences. I'm constantly learning and expanding my skill set, diving deep into Linux OS and scripting.</p>
+            </div>
+            <div className="skills-section">
+              <h3>Technical Skills</h3>
+              <div className="skills-grid">
+                {skills.map((skill, index) => <div key={index} className="skill-tag">{skill}</div>)}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="work" className="projects-section">
+          <h2 className="projects-title">// Selected Works</h2>
+          <div className="horizontal-scroll" ref={horizontalScrollRef}>
+            {projects.map((project, index) => (
+              <div key={index} className="project-card">
+                <div className="project-number">0{index + 1}</div>
+                <div className="project-content">
+                  <div className="project-header">
+                    <h3>{project.title}</h3>
+                    <p className="project-description">{project.description}</p>
+                  </div>
+                  <div className="project-tags">
+                    {project.tags.map((tag, i) => <span key={i} className="project-tag">{tag}</span>)}
+                  </div>
+                </div>
+                <div className="project-color-accent" style={{ background: project.color }} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="contact" className="contact">
+          <h2>Want to Start a Project?</h2>
+          <a href="mailto:your.email@example.com" className="cta-button">Let's Connect</a>
+          <div style={{ margin: '40px 0', opacity: 0.3 }}>— or —</div>
+          <div className="social-links">
+            <a href="https://github.com/DhyeyPatel007" target="_blank" rel="noopener noreferrer" className="social-link">
+              GitHub
+              <svg className="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </a>
+            <a href="https://www.instagram.com/dhyey2107/" target="_blank" rel="noopener noreferrer" className="social-link">
+              Instagram
+              <svg className="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </a>
+          </div>
+        </section>
+
+        <footer><p>© 2024 Dhyey Patel. All rights reserved.</p></footer>
+      </div>
+    );
+  }
+
+  // Render to root
+  const rootEl = document.getElementById('root');
+  const root = ReactDOM.createRoot(rootEl);
+  root.render(<Portfolio />);
+  </script>
+</body>
+</html>
